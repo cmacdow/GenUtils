@@ -12,6 +12,7 @@ function saveCurFigs(handles,format,fn_base,save_dir,fancyflag)
 %
 % @format (required)
 % Save format (e.g. '-dpdf' (or '-pdf' if fancyflag ==1) or any other format specificed in print fnct
+% Updated 8-2021 to accept cell array for format
 %
 % @fn_base (required) 
 % Base for the file name including the file extension. 
@@ -32,6 +33,11 @@ end
 if nargin<5
 	fancyflag=0;
 end
+
+if ~iscell(format)
+    format = {format};
+end
+
 	
 
 startDir = pwd; %so you return user to start dir after saving figs
@@ -47,13 +53,15 @@ for cur_f = 1:numel(handles)
     pos = get(fig,'Position');
     set(fig,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])   
     filename = sprintf('%d_%s',cur_f,fn_base);
-    if fancyflag ==1
-		export_fig(filename,format,fig,'-nocrop','-transparent','-painters')
-    else   
-        %Save the figure, with same suffix and iterate numbers as the prefix
-       print(fig,sprintf('%d_%s',cur_f,fn_base),format,'-painters')       
-	end
-end
+    for cur_format = 1:numel(format)
+        if fancyflag ==1
+            export_fig(filename,format{cur_format},fig,'-nocrop','-transparent','-painters')
+        else   
+            %Save the figure, with same suffix and iterate numbers as the prefix
+           print(fig,sprintf('%d_%s',cur_f,fn_base),format{cur_format},'-painters')       
+        end
+    end %format loop
+end %figure loop
 
 cd(startDir) %return user to start dir
 
